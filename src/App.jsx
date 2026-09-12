@@ -10,15 +10,20 @@ function LineBadge({ line }) {
 }
 
 // 1物件＝1枚のカード（スワイプで全物件を閲覧）
-function PropertyCard({ p, no, dir }) {
+function PropertyCard({ p, no }) {
   const photos = p.images || []
   const [photoIdx, setPhotoIdx] = useState(0)
   const pIdx = Math.min(photoIdx, Math.max(0, photos.length - 1))
   const photo = photos[pIdx]
   const isChamp = p.status === 'applied'
+  const multi = photos.length > 1
+  const goPhoto = (d) => (e) => {
+    e.stopPropagation()
+    setPhotoIdx((i) => (i + d + photos.length) % photos.length)
+  }
 
   return (
-    <article className={`pcard ${isChamp ? 'is-champ' : ''}`} data-dir={dir}>
+    <article className={`pcard ${isChamp ? 'is-champ' : ''}`}>
       <div className="pcard-photo">
         {photo ? (
           <img
@@ -30,16 +35,24 @@ function PropertyCard({ p, no, dir }) {
         )}
         <div className="pcard-scrim" />
 
-        {photos.length > 1 && (
-          <div className="photo-dots">
-            {photos.map((_, i) => (
-              <button
-                key={i} type="button"
-                className={`pdot ${i === pIdx ? 'is-on' : ''}`}
-                aria-label={`写真 ${i + 1}`} onClick={() => setPhotoIdx(i)}
-              />
-            ))}
-          </div>
+        {multi && (
+          <>
+            {/* 左右どこでもタップで写真送り */}
+            <button type="button" className="photo-tap pt-left" aria-label="前の写真" onClick={goPhoto(-1)} />
+            <button type="button" className="photo-tap pt-right" aria-label="次の写真" onClick={goPhoto(1)} />
+            <button type="button" className="photo-arrow pa-left" aria-label="前の写真" onClick={goPhoto(-1)}>‹</button>
+            <button type="button" className="photo-arrow pa-right" aria-label="次の写真" onClick={goPhoto(1)}>›</button>
+            <div className="photo-dots">
+              {photos.map((_, i) => (
+                <button
+                  key={i} type="button"
+                  className={`pdot ${i === pIdx ? 'is-on' : ''}`}
+                  aria-label={`写真 ${i + 1}`} onClick={(e) => { e.stopPropagation(); setPhotoIdx(i) }}
+                />
+              ))}
+            </div>
+            <span className="photo-count">{pIdx + 1} / {photos.length}</span>
+          </>
         )}
 
         {isChamp && <span className="pcard-ribbon">👑 本命 ・ 不動の第一希望</span>}
@@ -85,21 +98,43 @@ export default function App() {
   const championIdx = Math.max(0, all.findIndex((p) => p.status === 'applied'))
 
   const [idx, setIdx] = useState(championIdx) // ①=本命からスタート
-  const [dir, setDir] = useState(1)
   const [mapOpen, setMapOpen] = useState(false)
+  const [dx, setDx] = useState(0)          // ドラッグ量（Tinder風）
+  const [snap, setSnap] = useState(false)  // 手を離した時だけCSSトランジション
   const active = all[idx]
 
-  const go = (d) => { setDir(d); setIdx((i) => (i + d + all.length) % all.length) }
-  const jump = (i) => { setDir(i >= idx ? 1 : -1); setIdx(i) }
+  const go = (d) => setIdx((i) => (i + d + all.length) % all.length)
+  const jump = (i) => setIdx(i)
 
-  // スワイプ（横）で物件を切り替え
-  const touchX = useRef(null)
-  const onTouchStart = (e) => { touchX.current = e.touches[0].clientX }
-  const onTouchEnd = (e) => {
-    if (touchX.current == null) return
-    const dx = e.changedTouches[0].clientX - touchX.current
-    if (Math.abs(dx) > 45) go(dx < 0 ? 1 : -1)
-    touchX.current = null
+  // カードを掴んで動かす → 一定量でフリング（飛ばして）前後の物件へ
+  const startX = useRef(null)
+  const dragging = useRef(false)
+  const dxRef = useRef(0)
+  const onDown = (e) => { startX.current = e.clientX; dragging.current = false; setSnap(false) }
+  const onMove = (e) => {
+    if (startX.current == null) return
+    const d = e.clientX - startX.current
+    if (!dragging.current && Math.abs(d) > 8) {
+      dragging.current = true
+      try { e.currentTarget.setPointerCapture(e.pointerId) } catch { /* noop */ }
+    }
+    if (dragging.current) { dxRef.current = d; setDx(d) }
+  }
+  const endDrag = () => {
+    if (!dragging.current) { startX.current = null; return } // ただのタップ
+    const d = dxRef.current
+    dragging.current = false
+    startX.current = null
+    setSnap(true)
+    if (Math.abs(d) > 90) {
+      const dir = d < 0 ? 1 : -1
+      dxRef.current = 0
+      setDx(dir * window.innerWidth * 1.15) // 画面外へ飛ばす
+      window.setTimeout(() => { setSnap(false); setDx(0); go(dir) }, 280)
+    } else {
+      dxRef.current = 0
+      setDx(0) // 戻す（スプリング）
+    }
   }
 
   // 矢印キーでも切り替え／Escでシートを閉じる
@@ -117,6 +152,7 @@ export default function App() {
     <div className="app">
       <header className="topbar">
         <h1>二人のお部屋さがし</h1>
+        <p className="subtitle">しっとり鶏胸肉に火を通す</p>
       </header>
 
       {/* 上部：スワイプ操作バー（全物件をスライド） */}
@@ -134,9 +170,31 @@ export default function App() {
         <button className="nav-btn" onClick={() => go(1)} aria-label="次の物件">›</button>
       </div>
 
-      {/* 1物件＝1枚のカード */}
-      <div className="deck" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
-        <PropertyCard key={active.id} p={active} no={idx + 1} dir={dir} />
+      {/* 1物件＝1枚のカード（掴んでフリング） */}
+      <div className="deck">
+        <div className="card-stack">
+          <div
+            className="deck-card"
+            style={{
+              transform: `translateX(${dx}px) rotate(${dx * 0.045}deg)`,
+              transition: snap ? 'transform .34s cubic-bezier(.2,.7,.25,1)' : 'none',
+            }}
+            onPointerDown={onDown}
+            onPointerMove={onMove}
+            onPointerUp={endDrag}
+            onPointerCancel={endDrag}
+          >
+            <PropertyCard key={active.id} p={active} no={idx + 1} />
+            {dx !== 0 && (
+              <span
+                className={`swipe-hint ${dx < 0 ? 'is-next' : 'is-prev'}`}
+                style={{ opacity: Math.min(Math.abs(dx) / 110, 1) }}
+              >
+                {dx < 0 ? '次へ ▶' : '◀ 戻る'}
+              </span>
+            )}
+          </div>
+        </div>
 
         <div className="deck-actions">
           <button className="btn btn--map" onClick={() => setMapOpen(true)}>🗺️ 地図を見る</button>
