@@ -1,0 +1,112 @@
+.app { max-width: 1040px; margin: 0 auto; padding: 0 18px 60px; }
+
+/* ヘッダー */
+.topbar { padding: 30px 2px 16px; }
+.topbar h1 {
+  font-family: var(--serif); font-weight: 700; font-size: 30px;
+  letter-spacing: .02em; line-height: 1.25;
+}
+
+/* 地図：上部に固定。選んだ物件にピンが移動。全幅で見切れなし */
+.mapzone {
+  position: sticky; top: 0; z-index: 40;
+  background: var(--paper); padding: 8px 0 12px;
+}
+.map-frame {
+  border: 1px solid var(--line); border-radius: 14px; overflow: hidden;
+  background: var(--card); box-shadow: 0 6px 18px rgba(31,29,26,.06);
+}
+.gmap { width: 100%; height: min(48vh, 440px); border: 0; display: block; background: #eee; }
+.map-caption { padding: 13px 16px 15px; border-top: 1px solid var(--line); }
+.map-cap-main { display: flex; align-items: center; gap: 8px; }
+.map-cap-main b {
+  font-family: var(--serif); font-size: 17px; font-weight: 600; color: var(--ink);
+}
+.map-dot {
+  flex: none; width: 9px; height: 9px; border-radius: 50%;
+  background: var(--accent); box-shadow: 0 0 0 4px var(--accent-soft);
+}
+.map-addr { color: var(--muted); font-size: 12.5px; margin-top: 6px; }
+.map-floor {
+  margin-left: 8px; color: var(--accent); font-weight: 700; white-space: nowrap;
+}
+.map-stations { display: flex; flex-wrap: wrap; gap: 8px 14px; margin-top: 10px; }
+.map-stations li { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 700; }
+.map-actions { display: flex; gap: 10px; margin-top: 14px; }
+.btn {
+  display: inline-flex; align-items: center; gap: 5px; text-decoration: none;
+  font-size: 13px; font-weight: 700; color: var(--accent);
+  background: transparent; border: 1px solid var(--accent); border-radius: 999px;
+  padding: 9px 16px;
+}
+.btn:hover { background: var(--accent-soft); }
+
+/* カード：地図の下に2列でコンパクトに並べ、候補を一望できる */
+.grid {
+  display: grid; grid-template-columns: repeat(2, 1fr);
+  gap: 12px; margin-top: 16px;
+}
+.card {
+  background: var(--card); border: 1px solid var(--line);
+  border-radius: 14px; padding: 13px 15px; cursor: pointer;
+  display: flex; flex-direction: column;
+  transition: border-color .12s, box-shadow .12s, background .12s;
+}
+.card:hover { border-color: #d7d0c2; }
+.card.is-applied { border-color: var(--accent); }
+.card.is-active {
+  border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft);
+  background: #fffef9;
+}
+
+.card-top { display: flex; align-items: baseline; gap: 7px; }
+.pin-no {
+  font-family: var(--serif); font-size: 13px; font-weight: 700;
+  color: var(--accent); flex: none; min-width: 12px;
+}
+.card-name {
+  flex: 1;
+  font-family: var(--serif); font-size: 15.5px; font-weight: 600;
+  line-height: 1.3; letter-spacing: .01em;
+}
+.tag-applied {
+  align-self: flex-start; margin-bottom: 7px;
+  font-size: 9.5px; font-weight: 700; letter-spacing: .04em;
+  color: #fff; background: var(--accent); padding: 2px 8px; border-radius: 999px;
+  white-space: nowrap;
+}
+
+/* 一言プロフィール（2行でクランプしてカード高さをそろえる） */
+.intro {
+  font-family: var(--serif); font-size: 12.5px; color: #5c554c;
+  line-height: 1.55; margin: 8px 0 11px;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.card-foot { margin-top: auto; display: flex; flex-direction: column; align-items: flex-start; gap: 5px; }
+.rent {
+  font-family: var(--serif); font-size: 21px; font-weight: 700;
+  color: var(--ink); line-height: 1; font-feature-settings: "tnum";
+}
+.rent small { font-size: 12px; font-weight: 600; margin-left: 1px; }
+.spec { font-size: 12px; color: var(--muted); }
+.floor {
+  font-size: 11.5px; font-weight: 700; color: var(--accent);
+  background: var(--accent-soft); padding: 2px 8px; border-radius: 6px; white-space: nowrap;
+}
+.floor small { font-size: 10px; font-weight: 600; opacity: .8; }
+.line-badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 20px; height: 20px; border-radius: 50%; color: #fff;
+  font-size: 11px; font-weight: 800; flex: none;
+}
+
+/* スマホでも2列を維持。ごく細い端末だけ1列に */
+@media (max-width: 335px) {
+  .grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 420px) {
+  .topbar h1 { font-size: 26px; }
+}

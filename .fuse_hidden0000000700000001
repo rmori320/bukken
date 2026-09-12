@@ -1,0 +1,77 @@
+import { parse } from '@babel/parser'
+import _traverse from '@babel/traverse'
+import _generate from '@babel/generator'
+import * as t from '@babel/types'
+import fs from 'node:fs'
+const traverse = _traverse.default || _traverse
+const generate = _generate.default || _generate
+
+function jsxNameToExpr(node) {
+  if (t.isJSXIdentifier(node)) {
+    // lower-case tag => string literal, Capitalized => identifier
+    return /^[a-z]/.test(node.name) ? t.stringLiteral(node.name) : t.identifier(node.name)
+  }
+  if (t.isJSXMemberExpression(node)) {
+    return t.memberExpression(jsxNameToExpr(node.object), t.identifier(node.property.name))
+  }
+  return t.stringLiteral('div')
+}
+function attrsToObject(attributes) {
+  if (!attributes.length) return t.nullLiteral()
+  const props = []
+  for (const a of attributes) {
+    if (t.isJSXSpreadAttribute(a)) { props.push(t.spreadElement(a.argument)); continue }
+    const key = /^[a-zA-Z_][a-zA-Z0-9_]*$/.test(a.name.name) ? t.identifier(a.name.name) : t.stringLiteral(a.name.name)
+    let val
+    if (a.value == null) val = t.booleanLiteral(true)
+    else if (t.isStringLiteral(a.value)) val = a.value
+    else if (t.isJSXExpressionContainer(a.value)) val = a.value.expression
+    else val = t.stringLiteral('')
+    props.push(t.objectProperty(key, val))
+  }
+  return t.objectExpression(props)
+}
+function childrenOf(children) {
+  const out = []
+  for (const c of children) {
+    if (t.isJSXText(c)) {
+      const txt = c.value.replace(/\s+/g, ' ')
+      if (txt.trim() === '') continue
+      out.push(t.stringLiteral(txt))
+    } else if (t.isJSXExpressionContainer(c)) {
+      if (t.isJSXEmptyExpression(c.expression)) continue
+      out.push(c.expression)
+    } else if (t.isJSXElement(c) || t.isJSXFragment(c)) {
+      out.push(c) // will be transformed by traversal (bottom-up via exit)
+    }
+  }
+  return out
+}
+
+function transformFile(src) {
+  const ast = parse(src, { sourceType: 'module', plugins: ['jsx'] })
+  traverse(ast, {
+    // remove css imports
+    ImportDeclaration(path) {
+      if (/\.css$/.test(path.node.source.value)) path.remove()
+    },
+    JSXElement: { exit(path) {
+      const el = path.node
+      const callee = t.memberExpression(t.identifier('React'), t.identifier('createElement'))
+      const args = [jsxNameToExpr(el.openingElement.name), attrsToObject(el.openingElement.attributes), ...childrenOf(el.children)]
+      path.replaceWith(t.callExpression(callee, args))
+    } },
+    JSXFragment: { exit(path) {
+      const callee = t.memberExpression(t.identifier('React'), t.identifier('createElement'))
+      const args = [t.memberExpression(t.identifier('React'), t.identifier('Fragment')), t.nullLiteral(), ...childrenOf(path.node.children)]
+      path.replaceWith(t.callExpression(callee, args))
+    } },
+  })
+  let code = generate(ast).code
+  code = `import React from 'react'\n` + code
+  return code
+}
+
+const [,, inFile, outFile] = process.argv
+fs.writeFileSync(outFile, transformFile(fs.readFileSync(inFile, 'utf8')))
+console.log('transformed', inFile, '->', outFile)
