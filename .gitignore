@@ -12,6 +12,9 @@ dist
 dist-ssr
 *.local
 
+# FUSE filesystem artifacts (開いたまま削除されたファイルの一時ゴミ)
+.fuse_hidden*
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
