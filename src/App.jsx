@@ -16,6 +16,8 @@ function PropertyCard({ p, no }) {
   const pIdx = Math.min(photoIdx, Math.max(0, photos.length - 1))
   const photo = photos[pIdx]
   const isChamp = p.status === 'applied'
+  const outTag = p.status === 'closed' ? '募集終了' : p.status === 'declined' ? '見送り' : null
+  const isOut = Boolean(outTag)
   const multi = photos.length > 1
   const goPhoto = (d) => (e) => {
     e.stopPropagation()
@@ -23,7 +25,7 @@ function PropertyCard({ p, no }) {
   }
 
   return (
-    <article className={`pcard ${isChamp ? 'is-champ' : ''}`}>
+    <article className={`pcard ${isChamp ? 'is-champ' : ''} ${isOut ? 'is-out' : ''}`}>
       <div className="pcard-photo">
         {photo ? (
           <img
@@ -56,6 +58,7 @@ function PropertyCard({ p, no }) {
         )}
 
         {isChamp && <span className="pcard-ribbon">👑 本命 ・ 不動の第一希望</span>}
+        {outTag && <span className="pcard-stamp">{outTag}</span>}
 
         <div className="pcard-cap">
           <span className="pcard-no">{no}</span>
@@ -65,6 +68,12 @@ function PropertyCard({ p, no }) {
 
       <div className="pcard-body">
         {p.intro && <p className="pcard-intro">“{p.intro}”</p>}
+        {p.viewing && !isOut && (
+          <p className="pcard-viewing">
+            <span className="pcard-viewing-tag">New! 八代情報</span>
+            {p.viewing}
+          </p>
+        )}
 
         <div className="pcard-stats">
           <div className="pstat">
@@ -93,8 +102,18 @@ function PropertyCard({ p, no }) {
   )
 }
 
+// デッキの並び順（本命 → 募集中の候補 → 募集終了 → 見送り）
+const DECK_ORDER = [
+  'atlas-koishikawa',
+  'gala-residence-hongo',
+  'residia-hongo',
+  'korakuen-viewheights',
+  'clio-bunkyo-koishikawa',
+]
+
 export default function App() {
-  const all = SEED_PROPERTIES
+  const rank = (p) => { const i = DECK_ORDER.indexOf(p.id); return i === -1 ? 99 : i }
+  const all = [...SEED_PROPERTIES].sort((a, b) => rank(a) - rank(b))
   const championIdx = Math.max(0, all.findIndex((p) => p.status === 'applied'))
 
   const [idx, setIdx] = useState(championIdx) // ①=本命からスタート
@@ -162,7 +181,7 @@ export default function App() {
           {all.map((p, i) => (
             <button
               key={p.id} type="button"
-              className={`dot ${i === idx ? 'is-on' : ''} ${p.status === 'applied' ? 'dot--champ' : ''}`}
+              className={`dot ${i === idx ? 'is-on' : ''} ${p.status === 'applied' ? 'dot--champ' : ''} ${p.status === 'closed' || p.status === 'declined' ? 'dot--out' : ''}`}
               aria-label={`${i + 1}件目 ${p.name}`} onClick={() => jump(i)}
             />
           ))}
@@ -201,9 +220,10 @@ export default function App() {
           {active.homesUrl && (
             <a className="btn" href={active.homesUrl} target="_blank" rel="noreferrer">物件ページ</a>
           )}
+          {active.officialUrl && (
+            <a className="btn" href={active.officialUrl} target="_blank" rel="noreferrer">公式HP</a>
+          )}
         </div>
-
-        <p className="deck-hint">← スワイプ / ボタンで {all.length}件を切り替え →</p>
       </div>
 
       {/* 地図：下からせり上がるシート */}

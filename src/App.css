@@ -35,6 +35,8 @@
 .dot.is-on { background: var(--accent); transform: scale(1.35); }
 .dot--champ { background: var(--gold-line); }
 .dot--champ.is-on { background: var(--gold); }
+.dot--out { background: #cfc9bd; }
+.dot--out.is-on { background: var(--muted); }
 
 /* ── 1物件＝1枚のカード（Tinder風スワイプ） ── */
 /* 背後にカードの重なり＝デッキ感（フリング中も後ろは残る） */
@@ -62,6 +64,15 @@
   border: 1.5px solid var(--gold-line);
   box-shadow: 0 14px 36px rgba(168,134,60,.2);
   background: radial-gradient(120% 120% at 100% 0%, var(--gold-soft) 0%, var(--card) 48%);
+}
+/* 募集終了・見送り＝落ち着いたトーンに */
+.pcard.is-out { box-shadow: 0 8px 22px rgba(31,29,26,.08); }
+.pcard.is-out .pcard-photo img { filter: grayscale(.7) brightness(.9); }
+.pcard.is-out .pstat-num { color: var(--muted); }
+/* カード全体をうっすらグレーアウト */
+.pcard.is-out::after {
+  content: ""; position: absolute; inset: 0; z-index: 6; border-radius: 20px;
+  background: rgba(120,114,106,.18); pointer-events: none;
 }
 
 .pcard-photo { position: relative; }
@@ -121,6 +132,14 @@
   border: 1.5px solid var(--gold-line); border-radius: 999px;
   padding: 6px 15px; box-shadow: 0 3px 10px rgba(0,0,0,.22);
 }
+/* 募集終了・見送り＝斜めのコーナーリボン（定番の帯） */
+.pcard-stamp {
+  position: absolute; top: 24px; left: -52px; z-index: 7;
+  width: 200px; transform: rotate(-45deg); text-align: center;
+  font-family: var(--sans); font-weight: 800; font-size: 13px; letter-spacing: .14em;
+  color: #fff; background: rgba(74,70,64,.96);
+  padding: 7px 0; box-shadow: 0 3px 10px rgba(0,0,0,.32);
+}
 .pcard-cap {
   position: absolute; left: 18px; right: 18px; bottom: 16px;
   display: flex; align-items: baseline; gap: 10px;
@@ -137,6 +156,17 @@
 
 .pcard-body { padding: 16px 20px 20px; }
 .pcard-intro { font-family: var(--serif); font-size: 14px; color: #5c554c; line-height: 1.65; }
+.pcard-viewing {
+  margin-top: 10px; font-size: 12.5px; font-weight: 700; color: var(--accent);
+  background: var(--accent-soft); border: 1px solid #d5e3db; border-radius: 10px;
+  padding: 8px 12px; letter-spacing: .02em;
+}
+.pcard-viewing-tag {
+  display: inline-block; margin-right: 8px; vertical-align: middle;
+  font-size: 10.5px; font-weight: 800; letter-spacing: .04em; color: #fff;
+  background: #c15a34; border-radius: 6px; padding: 3px 8px;
+  box-shadow: 0 1px 4px rgba(193,90,52,.35);
+}
 .pcard-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 14px; }
 .pstat {
   display: flex; flex-direction: column; align-items: center; gap: 3px;
@@ -164,11 +194,7 @@
 .swipe-hint.is-next { right: 18px; transform: rotate(10deg); background: rgba(53,101,90,.9); }
 .swipe-hint.is-prev { left: 18px; transform: rotate(-10deg); background: rgba(168,134,60,.92); }
 
-.deck-actions { display: flex; gap: 10px; justify-content: center; margin-top: 16px; }
-.deck-hint {
-  text-align: center; color: var(--muted); font-size: 11.5px;
-  margin-top: 14px; letter-spacing: .04em;
-}
+.deck-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 16px; }
 
 /* 汎用ボタン */
 .btn {
