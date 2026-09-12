@@ -4,9 +4,9 @@
     {
       "name": "dev",
       "runtimeExecutable": "yarn",
-      "runtimeArgs": ["dev"],
-      "port": 5173,
-      "autoPort": true
+      "runtimeArgs": ["dev", "--port", "5199", "--strictPort"],
+      "port": 5199,
+      "autoPort": false
     }
   ]
 }

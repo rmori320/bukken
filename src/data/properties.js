@@ -23,6 +23,10 @@ export const SEED_PROPERTIES = [
     structure: 'SRC',
     units: 264,
     address: '東京都文京区小石川1丁目9-14',
+    images: [
+      'https://archive-image.homes.co.jp/v2/resize/3705272/9992c3ad229569c38d561e9d65dfb76f.jpg?width=640&height=640',
+      'https://文京区不動産.com/wp-content/uploads/2019/03/s-20190315_IMG_6695-480x320.jpg',
+    ],
     lat: 35.7114536,
     lng: 139.7520691,
     stations: [
@@ -72,6 +76,10 @@ export const SEED_PROPERTIES = [
     structure: 'SRC',
     units: 128,
     address: '東京都文京区小石川2丁目1-13',
+    images: [
+      'https://archive-image.homes.co.jp/v2/resize/125262/e6e8440e6f2959e5bdc9b9d78f1fa9eb.jpg?width=640&height=640',
+      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQYyqe5t0Bqoq3AVAr1i2pfKDuuJ9o3gnbZO0RpYimAKQ&s=10',
+    ],
     lat: 35.70835,
     lng: 139.75135,
     stations: [
@@ -121,6 +129,10 @@ export const SEED_PROPERTIES = [
     structure: '—',
     units: null,
     address: '東京都文京区本郷1丁目24-4',
+    images: [
+      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT_kEgFVfZip2FG0xx_iI1gpIudUaBLrS85esfwCp0I0w&s',
+      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQrCyTc-tBMpqmCfbKryKBKvt1gWWnCa7GlsUcDioFmcA&s=10',
+    ],
     lat: 35.70537,
     lng: 139.75544,
     stations: [
@@ -170,6 +182,11 @@ export const SEED_PROPERTIES = [
     structure: '—',
     units: null,
     address: '東京都文京区小石川1丁目13-9',
+    images: [
+      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSZoqpHtGKfZMWJVjRoAAndqqu35aPjZk8f-Ozb5PwC5g&s',
+      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQsYf8HD0O9kmCSkA9J5zTB4_frdPywhJK_IRlTVzbh-w&s',
+      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSCGMXeD4B60P8yevCG3QGmtLpOS7WPWKuUuUFdtJrq9w&s',
+    ],
     lat: 35.7128804,
     lng: 139.7520228,
     stations: [
@@ -217,6 +234,10 @@ export const SEED_PROPERTIES = [
     structure: '—',
     units: null,
     address: '東京都文京区本郷1丁目23-1',
+    images: [
+      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTNr_Lk7omocBXRf5XixNRZLE5_KeU5E3DaIyaXBQf37A&s',
+      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSyngLeJkBkyRLskwVeUyQpVOmkDeqqKLVCKG8fGXwytg&s',
+    ],
     lat: 35.70548,
     lng: 139.75509,
     stations: [

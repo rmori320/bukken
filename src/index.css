@@ -8,6 +8,9 @@
   --accent-soft: #eaf0ec;
   --ok: #35655a;
   --old: #b07d2b;
+  --gold: #a8863c;         /* 本命（首位）の金 */
+  --gold-soft: #f4ecd8;
+  --gold-line: #e4d3a4;
 
   --serif: "Shippori Mincho", "Hiragino Mincho ProN", "Yu Mincho", serif;
   --sans: "Zen Kaku Gothic New", system-ui, "Hiragino Kaku Gothic ProN",
